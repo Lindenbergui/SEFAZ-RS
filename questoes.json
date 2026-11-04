@@ -1,0 +1,124 @@
+{
+  "questoes": [
+    {
+      "id": "cont-0001",
+      "materia": "cont",
+      "assunto": "Balanço Patrimonial: classificação",
+      "tipo": "multipla",
+      "enunciado": "Uma empresa apresentava, em 31/12/X1, os saldos abaixo. Com base apenas nessas contas, o total do Ativo Circulante, em reais, era:",
+      "tabela": [
+        ["Conta", "Saldo (R$)"],
+        ["Caixa", "5.000"],
+        ["Duplicatas a receber (vencimento em 90 dias)", "12.000"],
+        ["Estoques de mercadorias", "8.000"],
+        ["Fornecedores", "9.000"],
+        ["Veículos", "30.000"],
+        ["Empréstimo bancário (vencimento em 30 meses)", "20.000"]
+      ],
+      "alternativas": ["17.000", "25.000", "55.000", "20.000", "13.000"],
+      "gabarito": "B",
+      "comentario": "Ativo Circulante = Caixa (5.000) + Duplicatas a receber de curto prazo (12.000) + Estoques (8.000) = 25.000. Veículos é Ativo Não Circulante (Imobilizado). Fornecedores é Passivo Circulante e o empréstimo com vencimento em 30 meses é Passivo Não Circulante.",
+      "fonte": "Inédita, estilo FCC"
+    },
+    {
+      "id": "trib-0001",
+      "materia": "trib",
+      "assunto": "Conceito de tributo",
+      "tipo": "multipla",
+      "enunciado": "Segundo o Código Tributário Nacional, tributo é toda prestação pecuniária compulsória, em moeda ou cujo valor nela se possa exprimir,",
+      "alternativas": [
+        "que constitua sanção de ato ilícito, instituída em lei e cobrada mediante atividade administrativa plenamente vinculada.",
+        "que não constitua sanção de ato ilícito, instituída em lei e cobrada mediante atividade administrativa plenamente vinculada.",
+        "que não constitua sanção de ato ilícito, instituída em lei ou decreto e cobrada mediante atividade administrativa discricionária.",
+        "cuja natureza jurídica é determinada pela destinação legal do produto da sua arrecadação.",
+        "que não constitua sanção de ato ilícito, instituída em lei e cobrada mediante atividade administrativa vinculada ou discricionária, conforme o caso."
+      ],
+      "gabarito": "B",
+      "comentario": "É o texto literal do art. 3º do CTN. Tributo nunca é sanção de ato ilícito (multa não é tributo), exige lei e é cobrado por atividade plenamente vinculada. A alternativa D contraria o art. 4º, II: a destinação legal da arrecadação é irrelevante para definir a natureza jurídica do tributo, que é determinada pelo fato gerador.",
+      "fonte": "Inédita, estilo FCC"
+    },
+    {
+      "id": "rt-0001",
+      "materia": "rt",
+      "assunto": "EC 132/2023: IBS, CBS e Imposto Seletivo",
+      "tipo": "multipla",
+      "enunciado": "De acordo com a Emenda Constitucional nº 132/2023, que reformou a tributação sobre o consumo, é correto afirmar:",
+      "alternativas": [
+        "O IBS é de competência da União e substituirá o PIS e a Cofins.",
+        "A CBS é de competência compartilhada entre Estados, Distrito Federal e Municípios e substituirá o ICMS e o ISS.",
+        "O IBS é de competência compartilhada entre Estados, Distrito Federal e Municípios, e a CBS é de competência da União.",
+        "O Imposto Seletivo substituirá integralmente o ICMS a partir de 2027.",
+        "O IBS e a CBS incidem de forma cumulativa, sem direito a crédito nas etapas anteriores."
+      ],
+      "gabarito": "C",
+      "comentario": "O IBS (art. 156-A da CF) é de competência compartilhada entre Estados, DF e Municípios e substitui ICMS e ISS. A CBS (art. 195, V) é federal e substitui PIS e Cofins. O Imposto Seletivo é federal e incide sobre bens e serviços prejudiciais à saúde ou ao meio ambiente, não substitui o ICMS. IBS e CBS são não cumulativos.",
+      "fonte": "Inédita, estilo FCC"
+    },
+    {
+      "id": "const-0001",
+      "materia": "const",
+      "assunto": "Princípios fundamentais",
+      "tipo": "multipla",
+      "enunciado": "Nos termos do art. 1º da Constituição Federal, são fundamentos da República Federativa do Brasil:",
+      "alternativas": [
+        "a soberania, a cidadania, a dignidade da pessoa humana, os valores sociais do trabalho e da livre iniciativa e o pluralismo político.",
+        "a independência nacional, a prevalência dos direitos humanos e a autodeterminação dos povos.",
+        "construir uma sociedade livre, justa e solidária e garantir o desenvolvimento nacional.",
+        "a soberania, a independência nacional, a cidadania e a defesa da paz.",
+        "erradicar a pobreza e a marginalização e reduzir as desigualdades sociais e regionais."
+      ],
+      "gabarito": "A",
+      "comentario": "Os cinco fundamentos do art. 1º formam o mnemônico SO-CI-DI-VA-PLU: soberania, cidadania, dignidade da pessoa humana, valores sociais do trabalho e da livre iniciativa, pluralismo político. As alternativas B e D trazem princípios das relações internacionais (art. 4º). As alternativas C e E trazem objetivos fundamentais (art. 3º), que começam com verbos.",
+      "fonte": "Inédita, estilo FCC"
+    },
+    {
+      "id": "adm-0001",
+      "materia": "adm",
+      "assunto": "Princípios da Administração Pública",
+      "tipo": "multipla",
+      "enunciado": "O princípio da eficiência passou a constar expressamente do caput do art. 37 da Constituição Federal a partir da",
+      "alternativas": [
+        "redação original de 1988.",
+        "Emenda Constitucional nº 19/1998.",
+        "Emenda Constitucional nº 20/1998.",
+        "Emenda Constitucional nº 32/2001.",
+        "Emenda Constitucional nº 45/2004."
+      ],
+      "gabarito": "B",
+      "comentario": "A EC 19/1998 (Reforma Administrativa) incluiu a eficiência no caput do art. 37, completando o LIMPE: legalidade, impessoalidade, moralidade, publicidade e eficiência. A redação original trazia apenas os quatro primeiros.",
+      "fonte": "Inédita, estilo FCC"
+    },
+    {
+      "id": "mf-0001",
+      "materia": "mf",
+      "assunto": "Juros compostos",
+      "tipo": "multipla",
+      "enunciado": "Um capital de R$ 10.000,00 foi aplicado a juros compostos de 10% ao mês. Ao final de 2 meses, o montante será de",
+      "alternativas": ["R$ 12.000,00", "R$ 12.100,00", "R$ 12.200,00", "R$ 11.000,00", "R$ 13.310,00"],
+      "gabarito": "B",
+      "comentario": "M = C × (1 + i)^n = 10.000 × 1,1² = 10.000 × 1,21 = 12.100. A alternativa A é o resultado em juros simples (10.000 × 1,20). A alternativa E corresponde a 3 meses (1,1³ = 1,331).",
+      "fonte": "Inédita, estilo FCC"
+    },
+    {
+      "id": "est-0001",
+      "materia": "est",
+      "assunto": "Média, mediana e moda",
+      "tipo": "multipla",
+      "enunciado": "Considere o conjunto de dados: 2, 3, 3, 5, 7, 10. A média aritmética, a mediana e a moda desse conjunto são, respectivamente,",
+      "alternativas": ["5, 4 e 3", "5, 3 e 3", "4, 5 e 3", "5, 4 e 10", "6, 4 e 3"],
+      "gabarito": "A",
+      "comentario": "Média = (2 + 3 + 3 + 5 + 7 + 10) / 6 = 30 / 6 = 5. Com 6 valores (quantidade par), a mediana é a média dos dois centrais: (3 + 5) / 2 = 4. Moda é o valor mais frequente: 3.",
+      "fonte": "Inédita, estilo FCC"
+    },
+    {
+      "id": "aud-0001",
+      "materia": "aud",
+      "assunto": "NBC TA 200: objetivos do auditor",
+      "tipo": "ce",
+      "enunciado": "Segundo a NBC TA 200, o objetivo geral do auditor é obter segurança absoluta de que as demonstrações contábeis, como um todo, estão livres de distorção relevante, independentemente se causada por fraude ou erro.",
+      "gabarito": "errado",
+      "comentario": "A norma fala em segurança razoável, que é um nível alto, mas não absoluto. A segurança absoluta é impossível por causa das limitações inerentes da auditoria: uso de julgamento, testes por amostragem, evidências mais persuasivas do que conclusivas e a possibilidade de fraude com conluio.",
+      "fonte": "Inédita, estilo FCC"
+    }
+  ]
+}

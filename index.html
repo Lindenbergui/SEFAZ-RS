@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Revisa AFRE">
+<meta name="theme-color" content="#1d6a4d">
+<title>Revisa AFRE</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231d6a4d'/%3E%3Cpath d='M18 34l9 9 19-21' stroke='white' stroke-width='7' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: app de uma coluna para tablet — cabeçalho + abas, telas trocadas no lugar, cartão de questão com alternativas grandes. */
+:root{
+  --bg:#f2f5f3; --surface:#ffffff; --ink:#16201b; --muted:#56655d; --line:#d5ddd8; --soft:#e8efea;
+  --accent:#1d6a4d; --accent-ink:#ffffff; --ok:#1f7a45; --ok-bg:#e1f3e8; --bad:#b3362f; --bad-bg:#fbe5e2; --hi:#a8660f;
+  --c-cont:#2c6a8c; --c-trib:#1d6a4d; --c-rt:#8a6414; --c-const:#8c3a4c; --c-adm:#5a4a8c; --c-mf:#5f6a1c; --c-est:#8a5326; --c-aud:#465068;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e1411; --surface:#161f1a; --ink:#e4ebe7; --muted:#93a39a; --line:#2a3630; --soft:#1d2822;
+  --accent:#4cbb8a; --accent-ink:#06130d; --ok:#5fd18f; --ok-bg:#14301f; --bad:#f08a80; --bad-bg:#3a1a17; --hi:#e6a94a;
+  --c-cont:#6fb0d4; --c-trib:#4cbb8a; --c-rt:#d8ad55; --c-const:#df8597; --c-adm:#a897e0; --c-mf:#b7c45c; --c-est:#dc9a62; --c-aud:#9aa6c4;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.5;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:860px;margin:0 auto;padding-block:18px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+h1,h2,h3{font-family:var(--f-display);font-stretch:85%;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1{font-size:28px;font-weight:800}
+h2{font-size:22px;font-weight:700}
+h3{font-size:18px;font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+header.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:grid;place-items:center}
+.logo svg{width:20px;height:20px}
+nav.tabs{display:flex;gap:4px;background:var(--soft);padding:4px;border-radius:12px;overflow-x:auto}
+nav.tabs button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:15px;padding:9px 14px;border-radius:9px;white-space:nowrap;min-height:42px}
+nav.tabs button[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+button{font:inherit;cursor:pointer;color:inherit}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:12px 18px;border-radius:12px;font-weight:700;min-height:48px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.small{min-height:40px;padding:8px 12px;font-size:15px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.wide{width:100%;font-size:18px;min-height:58px}
+:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:14px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.spread{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-weight:600;font-size:15px;display:inline-flex;gap:8px;align-items:center;min-height:42px}
+.chip .dot{width:10px;height:10px;border-radius:50%;background:var(--sc,var(--accent))}
+.chip .n{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.chip[aria-pressed="true"]{border-color:var(--sc,var(--accent));box-shadow:inset 0 0 0 1px var(--sc,var(--accent));background:var(--soft)}
+.limits{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.stepper{display:grid;gap:6px}
+.stepper .ctl{display:grid;grid-template-columns:52px 1fr 52px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.stepper button{border:0;background:var(--soft);font-size:22px;font-weight:700;min-height:52px}
+.stepper input{border:0;text-align:center;font:inherit;font-family:var(--f-mono);font-size:20px;background:transparent;color:var(--ink);width:100%;min-width:0}
+.stepper small{color:var(--muted);font-size:14px}
+table.stats{width:100%;border-collapse:collapse;font-size:15px}
+table.stats th,table.stats td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+table.stats th:first-child,table.stats td:first-child{text-align:left}
+table.stats th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+table.stats tr.total td{font-weight:700;border-bottom:0}
+.scroll{overflow-x:auto}
+.today-line{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:15px;color:var(--muted)}
+.today-line b{color:var(--ink)}
+/* Estudo */
+.progress{height:6px;background:var(--soft);border-radius:999px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .25s ease}
+.counts{display:flex;gap:14px;font-size:14px;color:var(--muted)}
+.counts b{font-family:var(--f-mono)}
+.qmeta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;color:var(--muted)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--sc);font-size:14px}
+.tag .dot{width:9px;height:9px;border-radius:50%;background:var(--sc)}
+.pill{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 9px;border-radius:999px;background:var(--soft);color:var(--muted)}
+.enun{font-size:19px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.qtable{border-collapse:collapse;font-size:16px;min-width:60%}
+.qtable td,.qtable th{border:1px solid var(--line);padding:6px 10px;text-align:left;font-variant-numeric:tabular-nums}
+.qtable tr:first-child td{font-weight:700;background:var(--soft)}
+.alts{display:grid;gap:10px}
+.alt{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px;font-size:17px;min-height:56px;line-height:1.45}
+.alt .l{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--soft);font-weight:700;font-family:var(--f-mono);font-size:15px}
+.alt span:last-child{white-space:pre-wrap;overflow-wrap:anywhere}
+.alt:not(:disabled):hover{border-color:var(--accent)}
+.alt.correct{border-color:var(--ok);background:var(--ok-bg)}
+.alt.correct .l{background:var(--ok);color:var(--surface)}
+.alt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.alt.wrong .l{background:var(--bad);color:var(--surface)}
+.alt:disabled{cursor:default}
+.ce{grid-template-columns:1fr 1fr}
+.ce .alt{grid-template-columns:1fr;text-align:center;font-weight:700;font-size:19px;place-items:center}
+.verdict{font-weight:800;font-family:var(--f-display);font-stretch:85%;font-size:22px}
+.verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
+.coment{border-top:1px solid var(--line);padding-top:12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px}
+.grades{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grade{display:grid;gap:2px;place-items:center;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px;min-height:64px;font-weight:700}
+.grade small{font-family:var(--f-mono);font-weight:500;color:var(--muted);font-size:13px}
+.grade.g1{border-color:var(--hi)} .grade.g2{border-color:var(--accent);background:var(--soft)} .grade.g3{border-color:var(--c-cont)}
+/* Banco */
+.search{width:100%;font:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);min-height:48px}
+.qlist{display:grid;gap:10px}
+details.qi{background:var(--surface);border:1px solid var(--line);border-radius:12px;border-left:4px solid var(--sc)}
+details.qi summary{list-style:none;cursor:pointer;padding:12px 14px;display:grid;gap:4px}
+details.qi summary::-webkit-details-marker{display:none}
+details.qi .snip{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:16px}
+details.qi .body{padding:0 14px 14px;display:grid;gap:10px}
+.ans{font-size:15px}
+.ans li{margin:2px 0}
+.ans li.c{color:var(--ok);font-weight:700}
+/* Formulários */
+label.f{display:grid;gap:6px;font-weight:600;font-size:15px}
+textarea,select,input[type=text]{font:inherit;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);width:100%;min-height:46px}
+textarea{min-height:120px;resize:vertical;font-size:16px}
+textarea.code{font-family:var(--f-mono);font-size:13px;min-height:200px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.result{font-size:15px;white-space:pre-wrap}
+.result.ok{color:var(--ok)} .result.bad{color:var(--bad)}
+.empty{text-align:center;padding:30px 10px;color:var(--muted);display:grid;gap:8px}
+#view{display:grid;gap:18px;min-width:0}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.2);z-index:20}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--soft);padding:1px 5px;border-radius:5px}
+pre.fmt{font-family:var(--f-mono);font-size:12.5px;background:var(--soft);padding:12px;border-radius:10px;overflow-x:auto;margin:0;line-height:1.5}
+@media (prefers-reduced-motion:reduce){.progress i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7" stroke="#fff" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div><h1>Revisa AFRE</h1><span class="eyebrow">SEFAZ/RS · revisão espaçada</span></div>
+    </div>
+    <nav class="tabs" aria-label="Seções">
+      <button data-view="home" aria-current="page">Revisar</button>
+      <button data-view="bank">Questões</button>
+      <button data-view="add">Adicionar</button>
+      <button data-view="data">Backup</button>
+    </nav>
+  </header>
+  <main id="view"></main>
+</div>
+<div id="toast" hidden></div>
+
+<script>
+"use strict";
+/* ---------------- Matérias (ciclo básico, sem Português) ---------------- */
+const MAT = {
+  cont:{n:"Contabilidade Geral",c:"--c-cont"},
+  trib:{n:"Direito Tributário",c:"--c-trib"},
+  rt:{n:"Reforma Tributária",c:"--c-rt"},
+  const:{n:"Direito Constitucional",c:"--c-const"},
+  adm:{n:"Direito Administrativo",c:"--c-adm"},
+  mf:{n:"Matemática Financeira",c:"--c-mf"},
+  est:{n:"Estatística",c:"--c-est"},
+  aud:{n:"Auditoria",c:"--c-aud"}
+};
+const MKEYS = Object.keys(MAT);
+const ALIAS = {contabilidade:"cont","contabilidade geral":"cont",tributario:"trib","direito tributario":"trib",reforma:"rt","reforma tributaria":"rt",constitucional:"const","direito constitucional":"const",administrativo:"adm","direito administrativo":"adm","matematica financeira":"mf",financeira:"mf",estatistica:"est",auditoria:"aud"};
+const LET = "ABCDEFGH";
+const MAX_IVL = 180;
+
+/* ---------------- Armazenamento ---------------- */
+const KEY = "revisa-afre:v1";
+let DB;
+function blank(){ return {versao:1, qs:{}, order:[], srs:{}, cfg:{mat:"all", novos:10, rev:40}, day:{date:"",novos:0,rev:0,ok:0,total:0}}; }
+function load(){
+  try{ const s = localStorage.getItem(KEY); DB = s ? Object.assign(blank(), JSON.parse(s)) : blank(); }
+  catch(e){ DB = blank(); }
+  DB.cfg = Object.assign(blank().cfg, DB.cfg||{});
+  DB.day = Object.assign(blank().day, DB.day||{});
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(DB)); return true; }
+  catch(e){ toast("Não consegui salvar: o armazenamento do navegador está cheio. Baixe um backup."); return false; }
+}
+
+/* ---------------- Datas ---------------- */
+const z = n => String(n).padStart(2,"0");
+function ymd(d=new Date()){ return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()); }
+function addDays(s,n){ const [y,m,d]=s.split("-").map(Number); return ymd(new Date(y,m-1,d+n)); }
+function fmtDate(s){ const [y,m,d]=s.split("-"); return d+"/"+m+"/"+y.slice(2); }
+function rollDay(){ const t=ymd(); if(DB.day.date!==t){ DB.day={date:t,novos:0,rev:0,ok:0,total:0}; save(); } }
+
+/* ---------------- Utilidades ---------------- */
+const $ = (s,el=document) => el.querySelector(s);
+const $$ = (s,el=document) => [...el.querySelectorAll(s)];
+function h(tag, attrs={}, ...kids){
+  const el = document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs||{})){
+    if(v==null || v===false) continue;
+    if(k==="class") el.className=v;
+    else if(k==="style") el.setAttribute("style",v);
+    else if(k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if(k==="text") el.textContent=v;
+    else el.setAttribute(k, v===true?"":v);
+  }
+  for(const c of kids.flat()){ if(c==null||c===false) continue; el.append(c instanceof Node ? c : document.createTextNode(String(c))); }
+  return el;
+}
+function strip(s){ return String(s??"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim(); }
+function hash(s){ let x=5381; for(let i=0;i<s.length;i++){ x=((x<<5)+x+s.charCodeAt(i))|0; } return (x>>>0).toString(36); }
+let toastT;
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true, 3200); }
+const col = k => `var(${MAT[k].c})`;
+
+/* ---------------- Formato e importação ---------------- */
+function matKey(v){
+  const s = strip(v);
+  if(MAT[s]) return s;
+  for(const k of MKEYS) if(strip(MAT[k].n)===s) return k;
+  return ALIAS[s] || null;
+}
+function normalize(raw){
+  if(!raw || typeof raw!=="object" || Array.isArray(raw)) throw "não é um objeto de questão";
+  const materia = matKey(raw.materia);
+  if(!materia) throw `matéria inválida ("${raw.materia ?? ""}"). Use: ${MKEYS.join(", ")}`;
+  const enunciado = String(raw.enunciado ?? "").trim();
+  if(!enunciado) throw "sem enunciado";
+  const alts = Array.isArray(raw.alternativas) ? raw.alternativas.map(a=>String(a).replace(/^\s*[A-Ha-h][\)\.\-]\s+/,"").trim()).filter(Boolean) : [];
+  let tipo = strip(raw.tipo);
+  if(!tipo) tipo = alts.length ? "multipla" : "ce";
+  if(["certo/errado","certo-errado","c/e","certoerrado"].includes(tipo)) tipo="ce";
+  if(["multipla escolha","multipla-escolha","me","objetiva"].includes(tipo)) tipo="multipla";
+  if(tipo!=="multipla" && tipo!=="ce") throw `tipo inválido ("${raw.tipo}"). Use "multipla" ou "ce"`;
+  const g = strip(raw.gabarito);
+  let correta;
+  if(tipo==="multipla"){
+    if(alts.length<2) throw "a questão de múltipla escolha precisa de pelo menos 2 alternativas";
+    const i = LET.toLowerCase().indexOf(g);
+    if(g.length!==1 || i<0 || i>=alts.length) throw `gabarito inválido ("${raw.gabarito ?? ""}")`;
+    correta = i;
+  } else {
+    if(["certo","c","certa","verdadeiro","v"].includes(g)) correta=0;
+    else if(["errado","e","errada","falso","f"].includes(g)) correta=1;
+    else throw `gabarito inválido ("${raw.gabarito ?? ""}"). Use "certo" ou "errado"`;
+  }
+  let tabela = null;
+  if(Array.isArray(raw.tabela) && raw.tabela.length) tabela = raw.tabela.map(r => Array.isArray(r) ? r.map(c=>String(c)) : [String(r)]);
+  const id = String(raw.id ?? "").trim() || (materia+"-"+hash(enunciado));
+  return { id, materia, assunto:String(raw.assunto??"").trim(), tipo, enunciado, tabela,
+           alternativas: tipo==="multipla" ? alts : [], correta,
+           comentario:String(raw.comentario??"").trim(), fonte:String(raw.fonte??"").trim() };
+}
+function toPlain(q){
+  const o = {id:q.id, materia:q.materia, assunto:q.assunto, tipo:q.tipo, enunciado:q.enunciado};
+  if(q.tabela) o.tabela = q.tabela;
+  if(q.tipo==="multipla"){ o.alternativas = q.alternativas; o.gabarito = LET[q.correta]; }
+  else o.gabarito = q.correta===0 ? "certo" : "errado";
+  if(q.comentario) o.comentario = q.comentario;
+  if(q.fonte) o.fonte = q.fonte;
+  return o;
+}
+function parseInput(text){
+  let t = String(text).trim().replace(/^```(?:json)?\s*/i,"").replace(/```\s*$/,"").trim();
+  if(!t) throw "Nada para importar.";
+  let j;
+  try{ j = JSON.parse(t); }
+  catch(e){ throw "O texto não é um JSON válido. Copie o bloco inteiro, do primeiro [ ou { até o último ] ou }."; }
+  if(Array.isArray(j)) return j;
+  if(j && Array.isArray(j.questoes)) return j.questoes;
+  return [j];
+}
+function importList(list){
+  let novas=0, atualizadas=0; const erros=[];
+  list.forEach((raw,i)=>{
+    try{
+      const q = normalize(raw);
+      const old = DB.qs[q.id];
+      if(!old){ novas++; DB.order.push(q.id); }
+      else if(JSON.stringify(old)!==JSON.stringify(q)) atualizadas++;
+      DB.qs[q.id] = q;
+    }catch(e){ erros.push(`Questão ${i+1}${raw&&raw.id?` (${raw.id})`:""}: ${e}`); }
+  });
+  save();
+  return {novas, atualizadas, erros};
+}
+
+/* ---------------- Repetição espaçada ---------------- */
+function isNewCard(s){ return !s; }
+function nextIvl(s, g){ // g: 1 difícil, 2 bom, 3 fácil
+  if(!s || (s.reps===0 && s.lapses===0)) return [1,2,4][g-1];
+  if(s.ivl===0) return [1,1,2][g-1];
+  if(g===1) return Math.min(MAX_IVL, Math.max(s.ivl+1, Math.round(s.ivl*1.2)));
+  if(g===2) return Math.min(MAX_IVL, Math.max(s.ivl+1, Math.round(s.ivl*s.ease)));
+  return Math.min(MAX_IVL, Math.max(s.ivl+2, Math.round(s.ivl*s.ease*1.3)));
+}
+function gradeCard(id, g){
+  const s = DB.srs[id] || {ivl:0, ease:2.5, reps:0, lapses:0};
+  const ivl = nextIvl(DB.srs[id], g);
+  if(g===1) s.ease = Math.max(1.3, s.ease-0.15);
+  if(g===3) s.ease = Math.min(3.0, s.ease+0.15);
+  s.ivl = ivl; s.reps++; s.last = ymd(); s.due = addDays(ymd(), ivl);
+  DB.srs[id] = s;
+}
+function failCard(id){
+  const s = DB.srs[id] || {ivl:0, ease:2.5, reps:0, lapses:0};
+  s.lapses++; s.ivl = 0; s.ease = Math.max(1.3, s.ease-0.2); s.last = ymd(); s.due = ymd();
+  DB.srs[id] = s;
+}
+function ivlLabel(d){ if(d<30) return d+(d===1?" dia":" dias"); const m=Math.round(d/30); return m+(m===1?" mês":" meses"); }
+
+/* ---------------- Fila do dia ---------------- */
+function matches(id, mat){ const q=DB.qs[id]; return q && (mat==="all" || q.materia===mat); }
+function available(mat){
+  rollDay();
+  const t = ymd();
+  const due = DB.order.filter(id => matches(id,mat) && DB.srs[id] && DB.srs[id].due<=t)
+                      .sort((a,b)=> DB.srs[a].due.localeCompare(DB.srs[b].due) || DB.srs[a].ivl-DB.srs[b].ivl);
+  const nw = DB.order.filter(id => matches(id,mat) && !DB.srs[id]);
+  const revLeft = Math.max(0, DB.cfg.rev - DB.day.rev);
+  const newLeft = Math.max(0, DB.cfg.novos - DB.day.novos);
+  return {due, nw, revTake: due.slice(0,revLeft), newTake: nw.slice(0,newLeft), revLeft, newLeft};
+}
+function interleave(rev, nw){
+  const out = [];
+  const step = nw.length ? Math.max(1, Math.round(rev.length/nw.length)) : rev.length;
+  let r=0, n=0;
+  while(r<rev.length || n<nw.length){
+    for(let k=0; k<step && r<rev.length; k++) out.push({id:rev[r++], kind:"rev"});
+    if(n<nw.length) out.push({id:nw[n++], kind:"new"});
+    if(!nw.length && r>=rev.length) break;
+  }
+  return out;
+}
+
+/* ---------------- Navegação ---------------- */
+let current = "home";
+function go(v){
+  current = v;
+  $$("nav.tabs button").forEach(b => b.setAttribute("aria-current", b.dataset.view===v ? "page" : "false"));
+  const view = $("#view"); view.replaceChildren();
+  ({home:renderHome, bank:renderBank, add:renderAdd, data:renderData, study:renderStudy})[v](view);
+  window.scrollTo({top:0});
+}
+$$("nav.tabs button").forEach(b => b.addEventListener("click", ()=>{
+  if(current==="study" && S && !S.finished && !window.confirm("Encerrar a sessão de revisão agora? O que você já respondeu fica salvo.")) return;
+  S = null; go(b.dataset.view);
+}));
+
+/* ---------------- Tela: Revisar ---------------- */
+function statsFor(mat){
+  const t = ymd(); let total=0, novas=0, hoje=0, dom=0;
+  for(const id of DB.order){
+    if(!matches(id,mat)) continue; total++;
+    const s = DB.srs[id];
+    if(!s) novas++; else { if(s.due<=t) hoje++; if(s.ivl>=21) dom++; }
+  }
+  return {total, novas, hoje, dom};
+}
+function stepper(id, label, value, onChange, hint){
+  const inp = h("input",{id, type:"number", inputmode:"numeric", min:"0", max:"500", value:String(value), "aria-label":label});
+  const set = v => { v = Math.max(0, Math.min(500, Math.round(+v||0))); inp.value=v; onChange(v); };
+  inp.addEventListener("change", ()=>set(inp.value));
+  return h("div",{class:"stepper"},
+    h("span",{class:"eyebrow"},label),
+    h("div",{class:"ctl"},
+      h("button",{type:"button","aria-label":"Diminuir",onclick:()=>set(+inp.value-5)},"−"),
+      inp,
+      h("button",{type:"button","aria-label":"Aumentar",onclick:()=>set(+inp.value+5)},"+")),
+    hint);
+}
+function renderHome(view){
+  rollDay();
+  const mat = DB.cfg.mat in MAT || DB.cfg.mat==="all" ? DB.cfg.mat : "all";
+  const av = available(mat);
+  const sessionSize = av.revTake.length + av.newTake.length;
+
+  if(!DB.order.length){
+    view.append(h("div",{class:"card"},
+      h("div",{class:"empty"},
+        h("h2",{},"Seu banco de questões está vazio"),
+        h("p",{},"Peça questões ao Claude e cole o bloco JSON na aba Adicionar. Se o seu repositório tiver um arquivo questoes.json, ele é carregado automaticamente ao abrir o app."),
+        h("div",{class:"row",style:"justify-content:center"}, h("button",{class:"btn primary",onclick:()=>go("add")},"Adicionar questões")))));
+    return;
+  }
+
+  const chips = h("div",{class:"chips",role:"group","aria-label":"Escolher matéria"});
+  const mk = (k, name, n) => h("button",{class:"chip",style:k==="all"?"":`--sc:${col(k)}`,"aria-pressed":String(mat===k),
+      onclick:()=>{ DB.cfg.mat=k; save(); go("home"); }},
+      k==="all"?null:h("span",{class:"dot"}), name, h("span",{class:"n"}, n));
+  chips.append(mk("all","Geral", statsFor("all").hoje + statsFor("all").novas));
+  for(const k of MKEYS){ const st=statsFor(k); if(st.total) chips.append(mk(k, MAT[k].n, st.hoje+st.novas)); }
+
+  const usedLine = h("p",{class:"today-line"},
+    h("span",{}, "Hoje: ", h("b",{class:"mono"}, DB.day.total), " respostas"),
+    h("span",{}, "Acerto ", h("b",{class:"mono"}, DB.day.total? Math.round(DB.day.ok/DB.day.total*100)+"%":"—")),
+    h("span",{}, "Novas ", h("b",{class:"mono"}, `${DB.day.novos}/${DB.cfg.novos}`)),
+    h("span",{}, "Revisões ", h("b",{class:"mono"}, `${DB.day.rev}/${DB.cfg.rev}`)));
+
+  const startBtn = h("button",{class:"btn primary wide",disabled:!sessionSize,onclick:startSession},
+    sessionSize ? `Começar revisão · ${sessionSize} ${sessionSize===1?"questão":"questões"}` : "Nada para revisar hoje nesta seleção");
+  const detail = h("p",{class:"muted",style:"font-size:15px"},
+    sessionSize ? `${av.revTake.length} ${av.revTake.length===1?"revisão":"revisões"} e ${av.newTake.length} ${av.newTake.length===1?"nova":"novas"}` +
+      (av.due.length>av.revTake.length ? ` · ${av.due.length-av.revTake.length} revisões ficaram de fora pelo limite diário` : "")
+    : (av.nw.length && !av.newLeft ? "Você já usou o limite de novas de hoje. Aumente o limite abaixo se quiser continuar." :
+       av.due.length && !av.revLeft ? "Você já usou o limite de revisões de hoje. Aumente o limite abaixo se quiser continuar." :
+       "Tudo em dia. Volte amanhã ou adicione questões novas."));
+
+  const limits = h("div",{class:"limits"},
+    stepper("lim-novos","Questões novas por dia", DB.cfg.novos, v=>{DB.cfg.novos=v; save(); refreshStart();}, h("small",{},"Questões que você ainda nunca respondeu")),
+    stepper("lim-rev","Revisões por dia", DB.cfg.rev, v=>{DB.cfg.rev=v; save(); refreshStart();}, h("small",{},"Questões antigas que venceram para hoje")));
+  function refreshStart(){ go("home"); }
+
+  const tb = h("table",{class:"stats"},
+    h("thead",{}, h("tr",{}, h("th",{},"Matéria"), h("th",{},"Total"), h("th",{},"Novas"), h("th",{},"Revisar hoje"), h("th",{},"Firmes"))));
+  const tbody = h("tbody");
+  for(const k of MKEYS){
+    const st = statsFor(k); if(!st.total) continue;
+    tbody.append(h("tr",{}, h("td",{}, h("span",{class:"tag",style:`--sc:${col(k)}`}, h("span",{class:"dot"}), MAT[k].n)),
+      h("td",{},st.total), h("td",{},st.novas), h("td",{},st.hoje), h("td",{},st.dom)));
+  }
+  const all = statsFor("all");
+  tbody.append(h("tr",{class:"total"}, h("td",{},"Total"), h("td",{},all.total), h("td",{},all.novas), h("td",{},all.hoje), h("td",{},all.dom)));
+  tb.append(tbody);
+
+  view.append(
+    h("section",{class:"card"},
+      h("div",{class:"spread"}, h("h2",{}, mat==="all" ? "Revisão geral" : MAT[mat].n), h("span",{class:"pill"}, fmtDate(ymd()))),
+      usedLine, chips, detail, startBtn),
+    h("section",{class:"card"}, h("h3",{},"Limites diários"), limits),
+    h("section",{class:"card"}, h("div",{class:"spread"},h("h3",{},"Seu banco"), h("span",{class:"muted",style:"font-size:14px"},"Firmes = intervalo de 21 dias ou mais")), h("div",{class:"scroll"},tb))
+  );
+}
+
+/* ---------------- Tela: Estudo ---------------- */
+let S = null;
+function startSession(){
+  const mat = DB.cfg.mat in MAT || DB.cfg.mat==="all" ? DB.cfg.mat : "all";
+  const av = available(mat);
+  const queue = interleave(av.revTake, av.newTake);
+  if(!queue.length) return;
+  S = {queue, cur:null, answered:false, done:0, ok:0, startTotal:queue.length, finished:false, seen:new Set()};
+  nextCard();
+}
+function nextCard(){
+  if(!S.queue.length){ S.finished=true; S.cur=null; go("study"); return; }
+  S.cur = S.queue.shift(); S.answered = false; S.choice = null;
+  if(!DB.qs[S.cur.id]) return nextCard();
+  go("study");
+}
+function renderStudy(view){
+  if(!S){ go("home"); return; }
+  if(S.finished){
+    const pct = S.done ? Math.round(S.ok/S.done*100) : 0;
+    view.append(h("section",{class:"card"},
+      h("div",{class:"empty"},
+        h("h2",{},"Sessão concluída"),
+        h("p",{}, `${S.done} ${S.done===1?"resposta":"respostas"} · ${pct}% de acerto na primeira tentativa de cada questão.`),
+        h("div",{class:"row",style:"justify-content:center"}, h("button",{class:"btn primary",onclick:()=>{S=null;go("home");}},"Voltar ao início")))));
+    return;
+  }
+  const q = DB.qs[S.cur.id];
+  const remaining = S.queue.length + 1;
+  const kinds = {new:0, rev:0, again:0}; [S.cur, ...S.queue].forEach(c=>kinds[c.kind]++);
+  const pct = Math.round((1 - remaining/(S.startTotal + kinds.again)) * 100);
+
+  const top = h("div",{class:"spread"},
+    h("div",{class:"counts"},
+      h("span",{},"Novas ", h("b",{},kinds.new)), h("span",{},"Revisões ", h("b",{},kinds.rev)), h("span",{},"De novo ", h("b",{},kinds.again))),
+    h("button",{class:"btn small",onclick:()=>{ if(window.confirm("Encerrar a sessão agora? O que você já respondeu fica salvo.")){ S=null; go("home"); } }},"Encerrar"));
+  const bar = h("div",{class:"progress"}, h("i",{style:`width:${Math.max(0,pct)}%`}));
+
+  const s = DB.srs[q.id];
+  const status = S.cur.kind==="new" ? "nova" : S.cur.kind==="again" ? "de novo" : `revisão · último intervalo ${ivlLabel(Math.max(1,s?.ivl||1))}`;
+  const meta = h("div",{class:"qmeta"},
+    h("span",{class:"tag",style:`--sc:${col(q.materia)}`}, h("span",{class:"dot"}), MAT[q.materia].n),
+    q.assunto ? h("span",{}, "· "+q.assunto) : null,
+    h("span",{class:"pill"}, status));
+
+  const card = h("section",{class:"card"}, meta, h("p",{class:"enun"}, q.enunciado));
+  if(q.tabela) card.append(renderTable(q.tabela));
+
+  const altsBox = h("div",{class:"alts"+(q.tipo==="ce"?" ce":"")});
+  const opts = q.tipo==="ce" ? ["Certo","Errado"] : q.alternativas;
+  opts.forEach((txt,i)=>{
+    const b = h("button",{class:"alt", "data-i":i, onclick:()=>answer(i)},
+      q.tipo==="ce" ? null : h("span",{class:"l"}, LET[i]),
+      h("span",{}, txt));
+    altsBox.append(b);
+  });
+  card.append(altsBox);
+  const after = h("div",{id:"after",style:"display:grid;gap:14px"});
+  card.append(after);
+  view.append(h("div",{style:"display:grid;gap:12px"}, top, bar, card));
+  if(S.answered) paintAnswer();
+}
+function renderTable(rows){
+  return h("div",{class:"scroll"}, h("table",{class:"qtable"}, h("tbody",{}, rows.map(r => h("tr",{}, r.map(c => h("td",{}, c)))))));
+}
+function answer(i){
+  if(!S || S.answered) return;
+  const q = DB.qs[S.cur.id];
+  S.answered = true; S.choice = i;
+  const correct = i===q.correta;
+  if(!S.seen.has(q.id)){
+    S.seen.add(q.id); S.done++; if(correct) S.ok++;
+    if(S.cur.kind==="new") DB.day.novos++;
+    if(S.cur.kind==="rev") DB.day.rev++;
+  }
+  DB.day.total++; if(correct) DB.day.ok++;
+  save();
+  paintAnswer();
+}
+function paintAnswer(){
+  const q = DB.qs[S.cur.id];
+  const correct = S.choice===q.correta;
+  $$(".alt").forEach(b => {
+    const i = +b.dataset.i; b.disabled = true;
+    if(i===q.correta) b.classList.add("correct");
+    else if(i===S.choice) b.classList.add("wrong");
+  });
+  const after = $("#after"); after.replaceChildren();
+  const right = q.tipo==="ce" ? (q.correta===0?"Certo":"Errado") : LET[q.correta];
+  after.append(h("p",{class:"verdict "+(correct?"ok":"bad")}, correct ? "Você acertou" : `Resposta: ${right}`));
+  if(q.comentario) after.append(h("p",{class:"coment"}, q.comentario));
+  if(q.fonte) after.append(h("p",{class:"muted",style:"font-size:14px"}, "Fonte: "+q.fonte));
+  if(correct){
+    const s = DB.srs[q.id];
+    after.append(h("p",{class:"muted",style:"font-size:15px"},"Como foi lembrar a resposta?"));
+    after.append(h("div",{class:"grades"},
+      [[1,"Difícil"],[2,"Bom"],[3,"Fácil"]].map(([g,lab]) =>
+        h("button",{class:"grade g"+g, "data-g":g, onclick:()=>{ gradeCard(q.id,g); save(); nextCard(); }},
+          lab, h("small",{}, "volta em "+ivlLabel(nextIvl(s,g)))))));
+  } else {
+    after.append(h("button",{class:"btn primary wide", id:"cont", onclick:()=>{
+      failCard(q.id); save();
+      S.queue.splice(Math.min(4, S.queue.length), 0, {id:q.id, kind:"again"});
+      nextCard();
+    }}, "Continuar · ela volta daqui a pouco"));
+  }
+  after.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto":"smooth", block:"nearest"});
+}
+document.addEventListener("keydown", e=>{
+  if(current!=="study" || !S || S.finished || e.target.closest("input,textarea,select")) return;
+  const k = e.key.toUpperCase(); const q = DB.qs[S.cur.id];
+  if(!S.answered){
+    if(q.tipo==="ce"){ if(k==="C") answer(0); if(k==="E") answer(1); }
+    else { const i = LET.indexOf(k); if(i>=0 && i<q.alternativas.length) answer(i); }
+  } else {
+    if(["1","2","3"].includes(k)){ const b=$(`.grade[data-g="${k}"]`); if(b) b.click(); }
+    if(k==="ENTER"){ const b=$("#cont")||$('.grade[data-g="2"]'); if(b){ e.preventDefault(); b.click(); } }
+  }
+});
+
+/* ---------------- Tela: Questões ---------------- */
+let bankFilter = "all", bankSearch = "";
+function renderBank(view){
+  const chips = h("div",{class:"chips",role:"group","aria-label":"Filtrar matéria"});
+  const mk = (k,name,n)=>h("button",{class:"chip",style:k==="all"?"":`--sc:${col(k)}`,"aria-pressed":String(bankFilter===k),onclick:()=>{bankFilter=k;go("bank");}},
+    k==="all"?null:h("span",{class:"dot"}), name, h("span",{class:"n"},n));
+  chips.append(mk("all","Todas",DB.order.length));
+  for(const k of MKEYS){ const n=DB.order.filter(id=>DB.qs[id]?.materia===k).length; if(n) chips.append(mk(k,MAT[k].n,n)); }
+  const search = h("input",{class:"search",type:"text",id:"bank-search",placeholder:"Buscar por assunto, enunciado ou código",value:bankSearch});
+  const list = h("div",{class:"qlist"});
+  search.addEventListener("input", ()=>{ bankSearch=search.value; fill(); });
+  function fill(){
+    list.replaceChildren();
+    const term = strip(bankSearch); const t = ymd();
+    const ids = DB.order.filter(id => matches(id,bankFilter) && (!term || strip(DB.qs[id].enunciado+" "+DB.qs[id].assunto+" "+id).includes(term)));
+    if(!ids.length){ list.append(h("p",{class:"empty"}, DB.order.length ? "Nenhuma questão encontrada." : "Nenhuma questão cadastrada ainda.")); return; }
+    ids.slice().reverse().slice(0,300).forEach(id=>{
+      const q = DB.qs[id], s = DB.srs[id];
+      const st = !s ? "nova" : s.due<=t ? "revisar hoje" : "revisa em "+fmtDate(s.due);
+      const alts = q.tipo==="ce" ? h("p",{class:"ans"}, "Gabarito: ", h("b",{}, q.correta===0?"Certo":"Errado"))
+        : h("ol",{class:"ans",type:"A"}, q.alternativas.map((a,i)=>h("li",{class:i===q.correta?"c":""}, a + (i===q.correta?"  ✓":""))));
+      list.append(h("details",{class:"qi",style:`--sc:${col(q.materia)}`},
+        h("summary",{},
+          h("div",{class:"qmeta"}, h("span",{class:"tag",style:`--sc:${col(q.materia)}`},h("span",{class:"dot"}),MAT[q.materia].n), q.assunto?h("span",{},"· "+q.assunto):null, h("span",{class:"pill"},st)),
+          h("span",{class:"snip"}, q.enunciado)),
+        h("div",{class:"body"},
+          h("p",{class:"enun",style:"font-size:16px"}, q.enunciado),
+          q.tabela ? renderTable(q.tabela) : null,
+          alts,
+          q.comentario ? h("p",{class:"coment"}, q.comentario) : null,
+          h("p",{class:"muted mono",style:"font-size:12px"}, id + (s? ` · ${s.reps} acertos · ${s.lapses} erros` : "")),
+          h("div",{class:"row"},
+            s ? h("button",{class:"btn small",onclick:()=>{ if(window.confirm("Zerar o progresso desta questão? Ela volta a ser nova.")){ delete DB.srs[id]; save(); fill(); toast("Progresso zerado."); } }},"Zerar progresso") : null,
+            h("button",{class:"btn small danger",onclick:()=>{ if(window.confirm("Excluir esta questão do banco?")){ delete DB.qs[id]; delete DB.srs[id]; DB.order=DB.order.filter(x=>x!==id); save(); fill(); toast("Questão excluída."); } }},"Excluir")))));
+    });
+    if(ids.length>300) list.append(h("p",{class:"muted",style:"text-align:center"}, `Mostrando as 300 mais recentes de ${ids.length}. Use a busca para achar as outras.`));
+  }
+  fill();
+  view.append(h("section",{class:"card"}, h("h2",{},"Questões"), chips, search), list);
+}
+
+/* ---------------- Tela: Adicionar ---------------- */
+function showResult(el, r){
+  const lines = [];
+  if(r.novas) lines.push(`${r.novas} ${r.novas===1?"questão nova adicionada":"questões novas adicionadas"}.`);
+  if(r.atualizadas) lines.push(`${r.atualizadas} ${r.atualizadas===1?"questão atualizada":"questões atualizadas"} (o progresso foi mantido).`);
+  if(!r.novas && !r.atualizadas && !r.erros.length) lines.push("Essas questões já estavam no banco, sem mudanças.");
+  if(r.erros.length) lines.push(`\nNão importei ${r.erros.length}:\n` + r.erros.join("\n"));
+  el.className = "result " + (r.erros.length && !r.novas && !r.atualizadas ? "bad" : "ok");
+  el.textContent = lines.join("\n");
+}
+function renderAdd(view){
+  const ta = h("textarea",{class:"code",id:"paste",placeholder:'Cole aqui o bloco JSON que o Claude gerou, por exemplo:\n[\n  { "materia": "trib", "assunto": "...", "enunciado": "...", "alternativas": ["...","...","...","...","..."], "gabarito": "B", "comentario": "..." }\n]'});
+  const res = h("p",{class:"result",role:"status"});
+  const file = h("input",{type:"file",accept:".json,application/json,text/plain",id:"file-q",style:"display:none"});
+  file.addEventListener("change", async ()=>{
+    const f = file.files[0]; if(!f) return;
+    try{ showResult(res, importList(parseInput(await f.text()))); }catch(e){ res.className="result bad"; res.textContent=String(e); }
+    file.value="";
+  });
+  const paste = h("section",{class:"card"},
+    h("h2",{},"Colar questões do Claude"),
+    h("p",{class:"muted"},"Peça as questões no chat, copie o bloco JSON inteiro e cole abaixo. Questões com o mesmo código substituem a versão anterior e mantêm o seu progresso."),
+    ta,
+    h("div",{class:"row"},
+      h("button",{class:"btn primary",onclick:()=>{ try{ showResult(res, importList(parseInput(ta.value))); if(!res.classList.contains("bad")) ta.value=""; }catch(e){ res.className="result bad"; res.textContent=String(e); } }},"Importar"),
+      h("button",{class:"btn",onclick:()=>file.click()},"Abrir arquivo .json"), file),
+    res);
+
+  // Cadastro manual
+  const f = {};
+  const matSel = h("select",{id:"m-mat"}, MKEYS.map(k=>h("option",{value:k},MAT[k].n)));
+  const tipoSel = h("select",{id:"m-tipo"}, h("option",{value:"multipla"},"Múltipla escolha (A–E)"), h("option",{value:"ce"},"Certo ou errado"));
+  const altsWrap = h("div",{style:"display:grid;gap:8px"});
+  const altInputs = [...LET.slice(0,5)].map(l => h("input",{type:"text",id:"m-alt-"+l,placeholder:"Alternativa "+l}));
+  altsWrap.append(...altInputs.map((inp,i)=>h("label",{class:"f"},"Alternativa "+LET[i], inp)));
+  const gabSel = h("select",{id:"m-gab"});
+  const fillGab = ()=>{ gabSel.replaceChildren(...(tipoSel.value==="ce" ? [h("option",{value:"certo"},"Certo"),h("option",{value:"errado"},"Errado")] : [...LET.slice(0,5)].map(l=>h("option",{value:l},l)))); altsWrap.hidden = tipoSel.value==="ce"; };
+  tipoSel.addEventListener("change", fillGab); fillGab();
+  const assunto = h("input",{type:"text",id:"m-assunto",placeholder:"Ex.: Responsabilidade tributária"});
+  const enun = h("textarea",{id:"m-enun",placeholder:"Texto da questão"});
+  const coment = h("textarea",{id:"m-coment",placeholder:"Por que a resposta está certa (aparece depois que você responde)"});
+  const res2 = h("p",{class:"result",role:"status"});
+  const manual = h("section",{class:"card"},
+    h("h2",{},"Cadastrar uma questão"),
+    h("div",{class:"grid2"}, h("label",{class:"f"},"Matéria",matSel), h("label",{class:"f"},"Tipo",tipoSel)),
+    h("label",{class:"f"},"Assunto",assunto),
+    h("label",{class:"f"},"Enunciado",enun),
+    altsWrap,
+    h("label",{class:"f"},"Gabarito",gabSel),
+    h("label",{class:"f"},"Comentário",coment),
+    h("div",{class:"row"}, h("button",{class:"btn primary",onclick:()=>{
+      const raw = {materia:matSel.value, tipo:tipoSel.value, assunto:assunto.value, enunciado:enun.value, gabarito:gabSel.value, comentario:coment.value,
+                   alternativas: tipoSel.value==="ce" ? [] : altInputs.map(i=>i.value).filter(v=>v.trim())};
+      const r = importList([raw]); showResult(res2, r);
+      if(!r.erros.length){ enun.value=""; coment.value=""; altInputs.forEach(i=>i.value=""); }
+    }},"Salvar questão")),
+    res2);
+
+  const fmt = h("section",{class:"card"},
+    h("h3",{},"Formato das questões"),
+    h("p",{class:"muted",style:"font-size:15px"},"Matérias aceitas: " + MKEYS.map(k=>`${k} (${MAT[k].n})`).join(", ") + ". Use \"tabela\" para dados de balancete ou quadros."),
+    h("pre",{class:"fmt"}, JSON.stringify([
+      {id:"trib-0001",materia:"trib",assunto:"Conceito de tributo",tipo:"multipla",enunciado:"Texto da questão",alternativas:["...","...","...","...","..."],gabarito:"B",comentario:"Explicação",fonte:"Inédita, estilo FCC"},
+      {id:"aud-0001",materia:"aud",assunto:"NBC TA 200",tipo:"ce",enunciado:"Afirmação para julgar",gabarito:"errado",comentario:"Explicação"}
+    ], null, 2)));
+  view.append(h("div",{style:"display:grid;gap:18px"}, paste, manual, fmt));
+}
+
+/* ---------------- Tela: Backup ---------------- */
+function download(name, text){
+  const blob = new Blob([text], {type:"application/json"});
+  const a = h("a",{href:URL.createObjectURL(blob), download:name});
+  document.body.append(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+function renderData(view){
+  const nQ = DB.order.length, nS = Object.keys(DB.srs).length;
+  let size = 0; try{ size = (localStorage.getItem(KEY)||"").length; }catch(e){}
+  const res = h("p",{class:"result",role:"status"});
+  const file = h("input",{type:"file",accept:".json,application/json",id:"file-bk",style:"display:none"});
+  file.addEventListener("change", async ()=>{
+    const f = file.files[0]; if(!f) return;
+    try{
+      const j = JSON.parse(await f.text());
+      if(j && j.qs && j.order){
+        if(!window.confirm(`Restaurar este backup? Ele tem ${j.order.length} questões e substitui tudo o que está neste aparelho.`)) return;
+        DB = Object.assign(blank(), j); save(); res.className="result ok"; res.textContent="Backup restaurado.";
+      } else {
+        showResult(res, importList(Array.isArray(j)?j:(j.questoes||[j])));
+      }
+    }catch(e){ res.className="result bad"; res.textContent="Não consegui ler esse arquivo. Ele precisa ser um backup ou um questoes.json deste app."; }
+    file.value="";
+  });
+  const stamp = ymd();
+  view.append(h("div",{style:"display:grid;gap:18px"},
+    h("section",{class:"card"},
+      h("h2",{},"Backup"),
+      h("p",{class:"muted"}, `Tudo fica salvo só neste navegador: ${nQ} questões e progresso de ${nS} (${(size/1024).toFixed(0)} KB). Se você limpar os dados do navegador ou trocar de aparelho, só recupera com um backup. Baixe um de vez em quando.`),
+      h("div",{class:"row"},
+        h("button",{class:"btn primary",onclick:()=>download(`revisa-afre-backup-${stamp}.json`, JSON.stringify(DB))},"Baixar backup completo"),
+        h("button",{class:"btn",onclick:()=>file.click()},"Restaurar backup"), file),
+      res),
+    h("section",{class:"card"},
+      h("h3",{},"Levar as questões para o GitHub"),
+      h("p",{class:"muted"},"Baixe só as questões, sem o progresso, e substitua o arquivo questoes.json do repositório. Assim elas carregam sozinhas em qualquer aparelho que abrir o app."),
+      h("div",{class:"row"}, h("button",{class:"btn",onclick:()=>download("questoes.json", JSON.stringify({questoes:DB.order.map(id=>toPlain(DB.qs[id]))}, null, 2))},"Baixar questoes.json"))),
+    h("section",{class:"card"},
+      h("h3",{},"Apagar dados"),
+      h("div",{class:"row"},
+        h("button",{class:"btn",onclick:()=>{ if(window.confirm("Zerar o progresso de todas as questões? As questões continuam no banco.")){ DB.srs={}; DB.day=blank().day; save(); toast("Progresso zerado."); go("data"); } }},"Zerar todo o progresso"),
+        h("button",{class:"btn danger",onclick:()=>{ if(window.confirm("Apagar todas as questões e todo o progresso deste aparelho? Isso não tem volta.")){ DB=blank(); save(); toast("Tudo apagado."); go("data"); } }},"Apagar tudo")))
+  ));
+}
+
+/* ---------------- Início ---------------- */
+load(); rollDay();
+try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
+go("home");
+// Carrega o questoes.json do repositório, se existir
+(async ()=>{
+  try{
+    const r = await fetch("questoes.json", {cache:"no-store"});
+    if(!r.ok) return;
+    const res = importList(parseInput(await r.text()));
+    if(res.novas){ toast(`${res.novas} ${res.novas===1?"questão nova carregada":"questões novas carregadas"} do questoes.json`); if(current==="home") go("home"); }
+  }catch(e){ /* sem arquivo ou offline: segue com o que está salvo */ }
+})();
+</script>
+</body>
+</html>
