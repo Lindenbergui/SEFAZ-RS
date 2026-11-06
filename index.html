@@ -16,7 +16,7 @@
 :root{
   --bg:#f2f5f3; --surface:#ffffff; --ink:#16201b; --muted:#56655d; --line:#d5ddd8; --soft:#e8efea;
   --accent:#1d6a4d; --accent-ink:#ffffff; --ok:#1f7a45; --ok-bg:#e1f3e8; --bad:#b3362f; --bad-bg:#fbe5e2; --hi:#a8660f;
-  --c-cont:#2c6a8c; --c-trib:#1d6a4d; --c-rt:#8a6414; --c-const:#8c3a4c; --c-adm:#5a4a8c; --c-mf:#5f6a1c; --c-est:#8a5326; --c-aud:#465068;
+  --c-trib:#1d6a4d; --c-rt:#8a6414; --c-const:#8c3a4c; --c-adm:#5a4a8c; --c-aud:#465068;
   --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
   --f-body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
@@ -25,7 +25,7 @@
 @media (prefers-color-scheme:dark){:root{
   --bg:#0e1411; --surface:#161f1a; --ink:#e4ebe7; --muted:#93a39a; --line:#2a3630; --soft:#1d2822;
   --accent:#4cbb8a; --accent-ink:#06130d; --ok:#5fd18f; --ok-bg:#14301f; --bad:#f08a80; --bad-bg:#3a1a17; --hi:#e6a94a;
-  --c-cont:#6fb0d4; --c-trib:#4cbb8a; --c-rt:#d8ad55; --c-const:#df8597; --c-adm:#a897e0; --c-mf:#b7c45c; --c-est:#dc9a62; --c-aud:#9aa6c4;
+  --c-trib:#4cbb8a; --c-rt:#d8ad55; --c-const:#df8597; --c-adm:#a897e0; --c-aud:#9aa6c4;
   color-scheme:dark}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -108,7 +108,7 @@ table.stats tr.total td{font-weight:700;border-bottom:0}
 .grades{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .grade{display:grid;gap:2px;place-items:center;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px;min-height:64px;font-weight:700}
 .grade small{font-family:var(--f-mono);font-weight:500;color:var(--muted);font-size:13px}
-.grade.g1{border-color:var(--hi)} .grade.g2{border-color:var(--accent);background:var(--soft)} .grade.g3{border-color:var(--c-cont)}
+.grade.g1{border-color:var(--hi)} .grade.g2{border-color:var(--accent);background:var(--soft)} .grade.g3{border-color:var(--c-const)}
 /* Banco */
 .search{width:100%;font:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);min-height:48px}
 .qlist{display:grid;gap:10px}
@@ -158,17 +158,14 @@ pre.fmt{font-family:var(--f-mono);font-size:12.5px;background:var(--soft);paddin
 "use strict";
 /* ---------------- Matérias (ciclo básico, sem Português) ---------------- */
 const MAT = {
-  cont:{n:"Contabilidade Geral",c:"--c-cont"},
   trib:{n:"Direito Tributário",c:"--c-trib"},
   rt:{n:"Reforma Tributária",c:"--c-rt"},
   const:{n:"Direito Constitucional",c:"--c-const"},
   adm:{n:"Direito Administrativo",c:"--c-adm"},
-  mf:{n:"Matemática Financeira",c:"--c-mf"},
-  est:{n:"Estatística",c:"--c-est"},
   aud:{n:"Auditoria",c:"--c-aud"}
 };
 const MKEYS = Object.keys(MAT);
-const ALIAS = {contabilidade:"cont","contabilidade geral":"cont",tributario:"trib","direito tributario":"trib",reforma:"rt","reforma tributaria":"rt",constitucional:"const","direito constitucional":"const",administrativo:"adm","direito administrativo":"adm","matematica financeira":"mf",financeira:"mf",estatistica:"est",auditoria:"aud"};
+const ALIAS = {tributario:"trib","direito tributario":"trib",reforma:"rt","reforma tributaria":"rt",constitucional:"const","direito constitucional":"const",administrativo:"adm","direito administrativo":"adm",auditoria:"aud"};
 const LET = "ABCDEFGH";
 const MAX_IVL = 180;
 
@@ -181,6 +178,14 @@ function load(){
   catch(e){ DB = blank(); }
   DB.cfg = Object.assign(blank().cfg, DB.cfg||{});
   DB.day = Object.assign(blank().day, DB.day||{});
+  // remove questões de matérias que saíram do app
+  const fora = DB.order.filter(id => !DB.qs[id] || !MAT[DB.qs[id].materia]);
+  if(fora.length){
+    fora.forEach(id => { delete DB.qs[id]; delete DB.srs[id]; });
+    DB.order = DB.order.filter(id => !fora.includes(id));
+    if(!(DB.cfg.mat in MAT)) DB.cfg.mat = "all";
+    save();
+  }
 }
 function save(){
   try{ localStorage.setItem(KEY, JSON.stringify(DB)); return true; }
